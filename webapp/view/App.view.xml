@@ -1,0 +1,101 @@
+<mvc:View
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:t="sap.ui.table"
+	controllerName="mis.documentos.controller.App"
+	displayBlock="true">
+
+	<App id="documentsApp">
+		<Page
+			id="documentosPage"
+			showHeader="false"
+			enableScrolling="true">
+
+			<content>
+				<VBox class="docWrapper">
+
+					<!-- Panel header: same structure as ZPAYDOC (Panel + OverflowToolbar) -->
+					<Panel id="docPanel">
+						<headerToolbar>
+							<OverflowToolbar style="Clear">
+								<Title text="Mis Documentos" />
+								<ToolbarSpacer />
+								<Button
+									text="Volver a Successfactors"
+									icon="sap-icon://shortcut"
+									press="onGoSFSF" />
+							</OverflowToolbar>
+						</headerToolbar>
+					</Panel>
+
+					<!-- Tree/table of documents -->
+					<t:TreeTable
+						id="treeTable"
+						selectionMode="None"
+						enableColumnReordering="false"
+						enableSelectAll="false"
+						visibleRowCountMode="Fixed"
+						visibleRowCount="14"
+						class="docTreeTable">
+
+						<t:columns>
+
+							<t:Column id="colGrupo" width="55%" sortProperty="name" filterProperty="name">
+								<t:label>
+									<Label text="Grupo / Tipo de Documento" class="docColHeader" />
+								</t:label>
+								<t:template>
+									<Text
+										text="{docs>name}"
+										wrapping="false"
+										class="{= ${docs>isGroup} ? 'docGroupCell' : 'docLeafCell' }" />
+								</t:template>
+							</t:Column>
+
+							<t:Column id="colFecha" width="15%" hAlign="Center" sortProperty="date" filterProperty="date">
+								<t:label>
+									<Label text="Fecha de Emisión" class="docColHeader" />
+								</t:label>
+								<t:template>
+									<Text
+										text="{docs>date}"
+										wrapping="false"
+										class="docLeafCell" />
+								</t:template>
+							</t:Column>
+
+							<t:Column id="colVer" width="15%" hAlign="Center">
+								<t:label>
+									<Label text="Ver Documento" class="docColHeader" />
+								</t:label>
+								<t:template>
+									<Button
+										icon="sap-icon://show"
+										type="Transparent"
+										press="handleShowPDF"
+										visible="{docs>viewable}"
+										tooltip="Ver documento"
+										class="docEyeBtn" />
+								</t:template>
+							</t:Column>
+
+							<t:Column id="colEstado" width="15%" hAlign="Center" sortProperty="status" filterProperty="status">
+								<t:label>
+									<Label text="Estado" class="docColHeader" />
+								</t:label>
+								<t:template>
+									<Text
+										text="{docs>status}"
+										wrapping="false"
+										class="docStatusCell" />
+								</t:template>
+							</t:Column>
+
+						</t:columns>
+					</t:TreeTable>
+
+				</VBox>
+			</content>
+		</Page>
+	</App>
+</mvc:View>

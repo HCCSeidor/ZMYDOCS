@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Mis Documentos</title>
+
+	<!-- Bootstrap desde CDN de SAP igual que ZPAYDOC.
+	     En localhost ui5 serve intercepta "resources/" y lo sirve localmente.
+	     En SAP NetWeaver se usa la misma CDN, sin dependencia del servidor ABAP. -->
+	<script id="sap-ui-bootstrap"
+		src="https://sapui5.hana.ondemand.com/1.149.0/resources/sap-ui-core.js"
+		data-sap-ui-async="true"
+		data-sap-ui-on-init="module:sap/ui/core/ComponentSupport"
+		data-sap-ui-resource-roots='{"mis.documentos": "./"}'
+		data-sap-ui-libs="sap.m, sap.ui.table"
+		data-sap-ui-theme="sap_horizon"
+		data-sap-ui-frame-options="allow">
+	</script>
+
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body class="sapUiBody">
+	<div data-sap-ui-component data-name="mis.documentos" data-id="app" data-settings='{"id": "app"}'></div>
+</body>
+</html>

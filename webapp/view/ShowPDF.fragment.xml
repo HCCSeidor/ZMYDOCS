@@ -1,0 +1,46 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:html="http://www.w3.org/1999/xhtml">
+
+	<Dialog
+		id="ShowPDF"
+		title=""
+		contentHeight="80vh"
+		contentWidth="860px"
+		draggable="true"
+		resizable="true"
+		verticalScrolling="false"
+		horizontalScrolling="false">
+
+		<content>
+			<!-- html:iframe sigue el patron exacto de ZPAYDOC (aplicacion
+			     deployada en produccion). El src se setea desde el controller
+			     via sap.ui.getCore().byId("pdfFrame").$()[0].src = url.
+			     Para la simulacion local se usa un archivo estatico (.pdf)
+			     para evitar restricciones CSP del servidor de desarrollo;
+			     en produccion (SAP NetWeaver) se usa el blob URL del base64. -->
+			<html:iframe
+				id="pdfFrame"
+				style="display:none; border:none;"
+				width="100%"
+				height="680px" />
+		</content>
+
+		<buttons>
+			<Button
+				id="btnDownload"
+				text="Descargar PDF"
+				icon="sap-icon://download"
+				press="onDownload"
+				type="Accept" />
+			<Button
+				id="btnClose"
+				text="Cerrar"
+				press="onCloseShowPDF"
+				type="Reject" />
+		</buttons>
+
+	</Dialog>
+
+</core:FragmentDefinition>

@@ -1,0 +1,17 @@
+specVersion: "3.2"
+metadata:
+  name: zpersondocs
+type: application
+builder:
+  customTasks:
+    - name: deploy-to-abap
+      afterTask: generateComponentPreload
+      configuration:
+        target:
+          url: https://my64786677.payroll.hr.cloud.sap
+          client: "100"
+          auth: basic
+        app:
+          name: ZPERSONDOCS
+          package: $TMP
+          description: MIS DOCUMENTOS

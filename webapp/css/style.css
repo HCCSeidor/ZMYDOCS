@@ -1,0 +1,207 @@
+/* MIS DOCUMENTOS — layout wrapper + table orange accents */
+
+/* -------------------------------------------------------------------------
+   Body: gray shell background (simulates SAP Fiori shell without launchpad)
+   Only set on html/body — never override Panel or Page backgrounds.
+   ------------------------------------------------------------------------- */
+
+html, body, .sapUiBody {
+	background: #ededed !important;
+}
+
+/* -------------------------------------------------------------------------
+   Wrapper VBox: centers content with side margins, matching SAP shell spacing
+   ------------------------------------------------------------------------- */
+
+.docWrapper {
+	margin: 1.5rem 2rem 2rem 2rem;
+}
+
+/* -------------------------------------------------------------------------
+   TreeTable: no outer border; orange column headers + row separators
+   ------------------------------------------------------------------------- */
+
+.docTreeTable {
+	border: none !important;
+	box-shadow: none !important;
+	width: 100% !important;
+}
+
+/* Column header row: orange bottom border only */
+.docTreeTable .sapUiTableColHdr,
+.docTreeTable .sapUiTableColRowHdr,
+.docTreeTable .sapUiTableHdr {
+	background: #ffffff !important;
+	border-top: none !important;
+	border-left: none !important;
+	border-right: none !important;
+	border-bottom: 1.5px solid #e97600 !important;
+	height: 38px;
+}
+
+/* Column header labels: orange uppercase */
+.docColHeader {
+	color: #e97600 !important;
+	font-weight: 700 !important;
+	font-size: 0.75rem !important;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.docTreeTable .sapUiTableColHdr .sapMLabel {
+	color: #e97600 !important;
+	font-weight: 700 !important;
+	font-size: 0.75rem !important;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+/* Row cells: white background, orange bottom separator */
+.docTreeTable .sapUiTableCell {
+	background: #ffffff !important;
+	border-bottom: 1px solid rgba(233, 118, 0, 0.25) !important;
+	border-left: none !important;
+	border-right: none !important;
+	border-top: none !important;
+}
+
+.docTreeTable .sapUiTableRowHdr {
+	background: #ffffff !important;
+	border-bottom: 1px solid rgba(233, 118, 0, 0.25) !important;
+	border-left: none !important;
+	border-right: none !important;
+}
+
+/* All row variants + empty area: white */
+.docTreeTable .sapUiTableRow,
+.docTreeTable .sapUiTableRowEven,
+.docTreeTable .sapUiTableRowOdd,
+.docTreeTable .sapUiTableRowEmpty,
+.docTreeTable .sapUiTableCCnt,
+.docTreeTable .sapUiTableCtrlScr,
+.docTreeTable .sapUiTableCtrlScrFixed,
+.docTreeTable .sapUiTableCtrlFixed {
+	background: #ffffff !important;
+}
+
+/* Remove outer table borders */
+.docTreeTable .sapUiTableOuterBefore,
+.docTreeTable .sapUiTableOuterAfter,
+.docTreeTable .sapUiTableBefore,
+.docTreeTable .sapUiTableAfter {
+	display: none !important;
+}
+
+.docTreeTable table,
+.docTreeTable .sapUiTableCtrl,
+.docTreeTable .sapUiTableScrollDiv {
+	border: none !important;
+}
+
+/* Row hover: faint orange tint */
+.docTreeTable .sapUiTableRowHvr .sapUiTableCell,
+.docTreeTable .sapUiTableRowHvr .sapUiTableRowHdr {
+	background: rgba(233, 118, 0, 0.04) !important;
+}
+
+/* Remove focus outlines */
+.docTreeTable .sapUiTableColHdr:focus,
+.docTreeTable .sapUiTableColRowHdr:focus,
+.docTreeTable .sapUiTableRowHdr:focus,
+.docTreeTable .sapUiTableCell:focus,
+.docTreeTable .sapUiTableRow:focus {
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+/* -------------------------------------------------------------------------
+   Tree expand/collapse icons: orange + / -
+   Horizon theme uses ::before on .sapUiTableTreeIcon with SAP-icons font
+   chars \e066 (closed) and \e1e2 (open). Override content + font-family
+   with !important. No child .sapUiIcon exists — icon is purely ::before.
+   ------------------------------------------------------------------------- */
+
+.docTreeTable .sapUiTableTreeIcon {
+	border: none !important;
+	outline: none !important;
+	background: transparent !important;
+	box-shadow: none !important;
+}
+
+.docTreeTable .sapUiTableTreeIconNodeClosed::before,
+.docTreeTable .sapUiTableTreeIconClosed::before {
+	content: "+" !important;
+	font-family: Arial, Helvetica, sans-serif !important;
+	color: #e97600 !important;
+	font-size: 0.875rem !important;
+	font-weight: 700 !important;
+}
+
+.docTreeTable .sapUiTableTreeIconNodeOpen::before,
+.docTreeTable .sapUiTableTreeIconOpen::before {
+	content: "-" !important;
+	font-family: Arial, Helvetica, sans-serif !important;
+	color: #e97600 !important;
+	font-size: 0.875rem !important;
+	font-weight: 700 !important;
+}
+
+.docTreeTable .sapUiTableTreeIconLeaf::before {
+	content: "" !important;
+}
+
+/* -------------------------------------------------------------------------
+   Cell text styles
+   ------------------------------------------------------------------------- */
+
+/* Group row: bold dark */
+.docGroupCell {
+	color: #1d1d1d;
+	font-weight: 700;
+	font-size: 0.875rem;
+}
+
+/* Leaf row */
+.docLeafCell {
+	color: #444444;
+	font-weight: 400;
+	font-size: 0.875rem;
+}
+
+/* Status cell */
+.docStatusCell {
+	color: #555555;
+	font-weight: 400;
+	font-size: 0.875rem;
+}
+
+/* -------------------------------------------------------------------------
+   Eye / view-document button: orange icon, no border
+   ------------------------------------------------------------------------- */
+
+.docEyeBtn {
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	padding: 0 !important;
+	min-width: 1.75rem !important;
+	width: 1.75rem !important;
+	height: 1.75rem !important;
+}
+
+.docEyeBtn .sapMBtnInner {
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+}
+
+.docEyeBtn .sapUiIcon,
+.docEyeBtn .sapMBtnIcon {
+	color: #e97600 !important;
+	font-size: 1.05rem;
+}
+
+.docEyeBtn:focus::after,
+.docEyeBtn:focus {
+	outline: none !important;
+}

@@ -1,0 +1,124 @@
+{
+	"documentos": [
+		{
+			"id": "g-personales",
+			"name": "Documentos Personales",
+			"date": "",
+			"status": "",
+			"viewable": false,
+			"isGroup": true,
+			"children": [
+				{
+					"id": "d-cv",
+					"name": "Curriculum Vitae",
+					"date": "",
+					"status": "",
+					"viewable": false,
+					"isGroup": false,
+					"children": []
+				},
+				{
+					"id": "g-dni",
+					"name": "Documento de Identidad",
+					"date": "",
+					"status": "",
+					"viewable": false,
+					"isGroup": true,
+					"children": [
+						{
+							"id": "d-dni",
+							"name": "Documento de Identidad",
+							"date": "02/06/2009",
+							"status": "Aprobado",
+							"viewable": true,
+							"isGroup": false,
+							"children": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"id": "g-certificados",
+			"name": "Certificados de Trabajo, Estudios y Capacitaciones",
+			"date": "",
+			"status": "",
+			"viewable": false,
+			"isGroup": true,
+			"children": []
+		},
+		{
+			"id": "g-familiares",
+			"name": "Documentos de Familiares",
+			"date": "",
+			"status": "",
+			"viewable": false,
+			"isGroup": true,
+			"children": []
+		},
+		{
+			"id": "g-ingreso",
+			"name": "Documentos de Ingreso",
+			"date": "",
+			"status": "",
+			"viewable": false,
+			"isGroup": true,
+			"children": []
+		},
+		{
+			"id": "g-etica",
+			"name": "Código de Ética",
+			"date": "",
+			"status": "",
+			"viewable": false,
+			"isGroup": true,
+			"children": [
+				{
+					"id": "d-compromiso",
+					"name": "Compromiso de Adhesión",
+					"date": "",
+					"status": "",
+					"viewable": false,
+					"isGroup": false,
+					"children": []
+				},
+				{
+					"id": "d-declaracion",
+					"name": "Declaración Jurada",
+					"date": "",
+					"status": "",
+					"viewable": false,
+					"isGroup": false,
+					"children": []
+				}
+			]
+		},
+		{
+			"id": "g-reglamentos",
+			"name": "Reglamentos y cargos",
+			"date": "",
+			"status": "",
+			"viewable": false,
+			"isGroup": true,
+			"children": []
+		},
+		{
+			"id": "g-autorizaciones",
+			"name": "Autorizaciones",
+			"date": "",
+			"status": "",
+			"viewable": false,
+			"isGroup": true,
+			"children": []
+		},
+		{
+			"id": "g-compensaciones",
+			"name": "Compensaciones",
+			"date": "",
+			"status": "",
+			"viewable": false,
+			"isGroup": true,
+			"children": []
+		}
+	]
+}

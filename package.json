@@ -1,0 +1,31 @@
+{
+  "name": "UI5",
+  "version": "1.0.0",
+  "description": "SAPUI5 - MIS DOCUMENTOS first hardcoded pass",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "ui5 serve --open index.html",
+    "serve": "ui5 serve --open index.html",
+    "deploy": "ui5 build --config ui5-deploy.yaml",
+    "lint": "ui5 lint",
+    "test": "echo \"No test specified for this hardcoded pass\" && exit 0"
+  },
+  "keywords": [
+    "sapui5",
+    "ui5"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@sap/ux-ui5-tooling": "^1.27.0",
+    "@ui5/cli": "^4.0.56"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.3.0",
+      "onFail": "download"
+    }
+  }
+}
