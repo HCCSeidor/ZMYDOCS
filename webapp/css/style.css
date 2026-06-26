@@ -206,10 +206,10 @@ body,
 }
 
 /* Parent rows: the TreeTable renders an open/closed tree icon before the cell text. */
-.docTreeTable .sapUiTableTreeIconNodeOpen ~ .docNameText,
-.docTreeTable .sapUiTableTreeIconOpen ~ .docNameText,
-.docTreeTable .sapUiTableTreeIconNodeClosed ~ .docNameText,
-.docTreeTable .sapUiTableTreeIconClosed ~ .docNameText {
+.docTreeTable .sapUiTableTreeIconNodeOpen~.docNameText,
+.docTreeTable .sapUiTableTreeIconOpen~.docNameText,
+.docTreeTable .sapUiTableTreeIconNodeClosed~.docNameText,
+.docTreeTable .sapUiTableTreeIconClosed~.docNameText {
   color: #1d1d1d !important;
   font-weight: 700 !important;
   font-size: 0.9rem !important;
@@ -259,24 +259,41 @@ body,
   border: none !important;
   box-shadow: none !important;
   padding: 0 !important;
-  min-width: 1.75rem !important;
-  width: 1.75rem !important;
-  height: 1.75rem !important;
+  min-width: 2.25rem !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
 }
 
-.docEyeBtn .sapMBtnInner {
+.docEyeBtn .sapMBtnInner,
+.docEyeBtn .sapMBtnInner:hover,
+.docEyeBtn .sapMBtnInner:active,
+.docEyeBtn .sapMBtnInner:focus {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
+  outline: none !important;
+}
+
+.docEyeBtn:focus::after,
+.docEyeBtn .sapMBtnFocusDiv {
+  display: none !important;
 }
 
 .docEyeBtn .sapUiIcon,
 .docEyeBtn .sapMBtnIcon {
   color: #e97600 !important;
-  font-size: 1.05rem;
+  font-size: 1.35rem !important;
+  line-height: 1.35rem !important;
 }
 
-.docEyeBtn:focus::after,
-.docEyeBtn:focus {
-  outline: none !important;
+.docEyeBtn .sapUiIcon::before,
+.docEyeBtn .sapMBtnIcon::before {
+  font-size: 1.35rem !important;
+}
+
+.docEyeBtn .sapMBtnInner {
+  min-width: 2.25rem !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  line-height: 2.25rem !important;
 }
