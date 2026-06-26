@@ -466,25 +466,6 @@ sap.ui.define([
 		},
 
 		// -------------------------------------------------------------------
-		// onDownload: descarga directa del PDF abierto en el iframe
-		// -------------------------------------------------------------------
-		onDownload: function () {
-			if (!selectedDoc) { return; }
-			var sName = (selectedDoc.name || "documento").replace(/[^A-Za-z0-9._-]+/g, "_") + ".pdf";
-			// Si tenemos un blob URL activo lo usamos; si no, el archivo estatico
-			var sHref = (this._sShowPDFUrl && this._sShowPDFUrl.startsWith("blob:"))
-				? this._sShowPDFUrl
-				: SAMPLE_PDF_URL;
-			var oLink = document.createElement("a");
-			oLink.href = sHref;
-			oLink.download = sName;
-			oLink.style.display = "none";
-			document.body.appendChild(oLink);
-			oLink.click();
-			document.body.removeChild(oLink);
-		},
-
-		// -------------------------------------------------------------------
 		// onCloseShowPDF: handler de Cerrar / Cancelar
 		// -------------------------------------------------------------------
 		// Cierra el dialogo, revoca la objectURL para no fugar memoria y
