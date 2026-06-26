@@ -5,8 +5,53 @@
    Only set on html/body — never override Panel or Page backgrounds.
    ------------------------------------------------------------------------- */
 
-html, body, .sapUiBody {
-	background: #ededed !important;
+html,
+body,
+.sapUiBody {
+  background: #ededed !important;
+}
+
+/* -------------------------------------------------------------------------
+   Header panel ("Mis Documentos"): sin bordes ni sombra abajo, para que
+   quede pegado visualmente a la tabla sin ningún corte entre ambos.
+   ------------------------------------------------------------------------- */
+
+.docHeaderPanel {
+  margin: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.docHeaderPanel .sapMPanelWrappingDiv {
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  background: #ffffff !important;
+}
+
+.docHeaderPanel .sapMPanelHdr,
+.docHeaderPanel .sapMTB,
+.docHeaderPanel .sapMOTB {
+  background: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding-bottom: 0 !important;
+}
+
+/* -------------------------------------------------------------------------
+   Título "Mis Documentos": serif en negrita, color naranja, tamaño mayor
+   (estilo de la segunda imagen de referencia)
+   ------------------------------------------------------------------------- */
+
+.docTitle,
+.docTitle .sapMTitle,
+.docHeaderPanel .docTitle {
+  font-family: Georgia, "Times New Roman", Times, serif !important;
+  font-weight: 700 !important;
+  color: #e97600 !important;
+  font-size: 1.75rem !important;
+  letter-spacing: 0.01em;
 }
 
 /* -------------------------------------------------------------------------
@@ -14,7 +59,7 @@ html, body, .sapUiBody {
    ------------------------------------------------------------------------- */
 
 .docWrapper {
-	margin: 1.5rem 2rem 2rem 2rem;
+  margin: 1.5rem 2rem 2rem 2rem;
 }
 
 /* -------------------------------------------------------------------------
@@ -22,54 +67,54 @@ html, body, .sapUiBody {
    ------------------------------------------------------------------------- */
 
 .docTreeTable {
-	border: none !important;
-	box-shadow: none !important;
-	width: 100% !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: 100% !important;
 }
 
 /* Column header row: orange bottom border only */
 .docTreeTable .sapUiTableColHdr,
 .docTreeTable .sapUiTableColRowHdr,
 .docTreeTable .sapUiTableHdr {
-	background: #ffffff !important;
-	border-top: none !important;
-	border-left: none !important;
-	border-right: none !important;
-	border-bottom: 1.5px solid #e97600 !important;
-	height: 38px;
+  background: #ffffff !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: 1.5px solid #e97600 !important;
+  height: 38px;
 }
 
 /* Column header labels: orange uppercase */
 .docColHeader {
-	color: #e97600 !important;
-	font-weight: 700 !important;
-	font-size: 0.75rem !important;
-	letter-spacing: 0.04em;
-	text-transform: uppercase;
+  color: #e97600 !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .docTreeTable .sapUiTableColHdr .sapMLabel {
-	color: #e97600 !important;
-	font-weight: 700 !important;
-	font-size: 0.75rem !important;
-	letter-spacing: 0.04em;
-	text-transform: uppercase;
+  color: #e97600 !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 /* Row cells: white background, orange bottom separator */
 .docTreeTable .sapUiTableCell {
-	background: #ffffff !important;
-	border-bottom: 1px solid rgba(233, 118, 0, 0.25) !important;
-	border-left: none !important;
-	border-right: none !important;
-	border-top: none !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid rgba(233, 118, 0, 0.25) !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
 }
 
 .docTreeTable .sapUiTableRowHdr {
-	background: #ffffff !important;
-	border-bottom: 1px solid rgba(233, 118, 0, 0.25) !important;
-	border-left: none !important;
-	border-right: none !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid rgba(233, 118, 0, 0.25) !important;
+  border-left: none !important;
+  border-right: none !important;
 }
 
 /* All row variants + empty area: white */
@@ -81,7 +126,7 @@ html, body, .sapUiBody {
 .docTreeTable .sapUiTableCtrlScr,
 .docTreeTable .sapUiTableCtrlScrFixed,
 .docTreeTable .sapUiTableCtrlFixed {
-	background: #ffffff !important;
+  background: #ffffff !important;
 }
 
 /* Remove outer table borders */
@@ -89,19 +134,19 @@ html, body, .sapUiBody {
 .docTreeTable .sapUiTableOuterAfter,
 .docTreeTable .sapUiTableBefore,
 .docTreeTable .sapUiTableAfter {
-	display: none !important;
+  display: none !important;
 }
 
 .docTreeTable table,
 .docTreeTable .sapUiTableCtrl,
 .docTreeTable .sapUiTableScrollDiv {
-	border: none !important;
+  border: none !important;
 }
 
 /* Row hover: faint orange tint */
 .docTreeTable .sapUiTableRowHvr .sapUiTableCell,
 .docTreeTable .sapUiTableRowHvr .sapUiTableRowHdr {
-	background: rgba(233, 118, 0, 0.04) !important;
+  background: rgba(233, 118, 0, 0.04) !important;
 }
 
 /* Remove focus outlines */
@@ -110,8 +155,8 @@ html, body, .sapUiBody {
 .docTreeTable .sapUiTableRowHdr:focus,
 .docTreeTable .sapUiTableCell:focus,
 .docTreeTable .sapUiTableRow:focus {
-	outline: none !important;
-	box-shadow: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* -------------------------------------------------------------------------
@@ -122,57 +167,87 @@ html, body, .sapUiBody {
    ------------------------------------------------------------------------- */
 
 .docTreeTable .sapUiTableTreeIcon {
-	border: none !important;
-	outline: none !important;
-	background: transparent !important;
-	box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .docTreeTable .sapUiTableTreeIconNodeClosed::before,
 .docTreeTable .sapUiTableTreeIconClosed::before {
-	content: "+" !important;
-	font-family: Arial, Helvetica, sans-serif !important;
-	color: #e97600 !important;
-	font-size: 0.875rem !important;
-	font-weight: 700 !important;
+  content: "+" !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  color: #e97600 !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
 }
 
 .docTreeTable .sapUiTableTreeIconNodeOpen::before,
 .docTreeTable .sapUiTableTreeIconOpen::before {
-	content: "-" !important;
-	font-family: Arial, Helvetica, sans-serif !important;
-	color: #e97600 !important;
-	font-size: 0.875rem !important;
-	font-weight: 700 !important;
+  content: "-" !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  color: #e97600 !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
 }
 
 .docTreeTable .sapUiTableTreeIconLeaf::before {
-	content: "" !important;
+  content: "" !important;
 }
 
 /* -------------------------------------------------------------------------
    Cell text styles
    ------------------------------------------------------------------------- */
 
-/* Group row: bold dark */
-.docGroupCell {
-	color: #1d1d1d;
-	font-weight: 700;
-	font-size: 0.875rem;
+.docNameText {
+  color: #6b6b6b !important;
+  font-weight: 300 !important;
+  font-size: 0.85rem !important;
 }
 
-/* Leaf row */
-.docLeafCell {
-	color: #444444;
-	font-weight: 400;
-	font-size: 0.875rem;
+/* Parent rows: the TreeTable renders an open/closed tree icon before the cell text. */
+.docTreeTable .sapUiTableTreeIconNodeOpen ~ .docNameText,
+.docTreeTable .sapUiTableTreeIconOpen ~ .docNameText,
+.docTreeTable .sapUiTableTreeIconNodeClosed ~ .docNameText,
+.docTreeTable .sapUiTableTreeIconClosed ~ .docNameText {
+  color: #1d1d1d !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
 }
 
-/* Status cell */
-.docStatusCell {
-	color: #555555;
-	font-weight: 400;
-	font-size: 0.875rem;
+.docNameCell[data-isgroup="true"] {
+  color: #1d1d1d !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+}
+
+.docNameCell[data-isgroup="false"] {
+  color: #6b6b6b !important;
+  font-weight: 300 !important;
+  font-size: 0.85rem !important;
+}
+
+.docGroupCell,
+.docGroupCell .sapMObjStatusText,
+.docGroupCell .sapMText {
+  color: #1d1d1d !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+}
+
+.docLeafCell,
+.docLeafCell .sapMObjStatusText,
+.docLeafCell .sapMText {
+  color: #6b6b6b !important;
+  font-weight: 300 !important;
+  font-size: 0.85rem !important;
+}
+
+.docStatusCell,
+.docStatusCell .sapMText {
+  color: #6b6b6b !important;
+  font-weight: 300 !important;
+  font-size: 0.85rem !important;
 }
 
 /* -------------------------------------------------------------------------
@@ -180,28 +255,28 @@ html, body, .sapUiBody {
    ------------------------------------------------------------------------- */
 
 .docEyeBtn {
-	background: transparent !important;
-	border: none !important;
-	box-shadow: none !important;
-	padding: 0 !important;
-	min-width: 1.75rem !important;
-	width: 1.75rem !important;
-	height: 1.75rem !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  min-width: 1.75rem !important;
+  width: 1.75rem !important;
+  height: 1.75rem !important;
 }
 
 .docEyeBtn .sapMBtnInner {
-	background: transparent !important;
-	border: none !important;
-	box-shadow: none !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .docEyeBtn .sapUiIcon,
 .docEyeBtn .sapMBtnIcon {
-	color: #e97600 !important;
-	font-size: 1.05rem;
+  color: #e97600 !important;
+  font-size: 1.05rem;
 }
 
 .docEyeBtn:focus::after,
 .docEyeBtn:focus {
-	outline: none !important;
+  outline: none !important;
 }
