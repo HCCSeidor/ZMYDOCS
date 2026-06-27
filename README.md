@@ -1,119 +1,103 @@
-# ZPERSONDOCS — Mis Documentos (Yambal)
+# ZPERSONDOCS — Mis Documentos
 
-Formulario SAPUI5 para la visualización de documentos personales del colaborador.
-Desarrollado siguiendo el mismo estándar y arquitectura de **ZPAYDOC** (Documentos de planilla), que ya está deployado y en producción en el mismo servidor SAP.
-
----
-
-## Estado actual
-
-| Capa | Estado |
-|------|--------|
-| Frontend / Layout | ✅ Completo — listo para deploy |
-| Simulación de datos | ✅ Activa (datos hardcodeados en controller) |
-| Integración ABAP | ⏳ Pendiente — requiere los 2 endpoints detallados abajo |
-
-**El equipo ABAP debe entregar los endpoints.** El frontend ya está preparado para recibirlos: cada función simulada tiene el código real comentado como reemplazo directo (`[REEMPLAZAR ABAP]`).
+Formulario SAPUI5 para que el colaborador vea sus documentos personales.
+Se desarrolló siguiendo el mismo estándar de ZPAYDOC (Documentos de planilla),
+que ya está deployado en el mismo servidor.
 
 ---
 
-## Identificadores del proyecto
+## Qué falta para que funcione en producción
 
-| Campo | Valor |
-|-------|-------|
-| BSP App | `ZPERSONDOCS` |
-| Namespace SAPUI5 | `mis.documentos` |
-| Paquete de prueba | `$TMP` |
-| Paquete final | `ZHCC_PE` |
-| Ruta local | `C:\SAPUI5` |
-| URL final en producción | `/sap/bc/ui5_ui5/sap/zpersondocs/index.html?sap-client=100` |
-| Referencia de arquitectura | `C:\Proyectos de GUIA UI5\ZPAYDOC` |
+El frontend está completo y funcionando con datos simulados. Lo único pendiente
+es que ABAP exponga los 2 endpoints descritos abajo. Cuando estén listos, los
+reemplazos en el código son directos — cada función simulada tiene el código real
+comentado encima, solo hay que descomentar y ajustar el nombre del servicio.
 
 ---
 
-## Lo que NO tiene este formulario (decisión confirmada por BG/Luis)
+## Datos del proyecto
 
-- ❌ No hay filtros **Período Inicio / Período Fin**
-- ❌ No hay botón **Cargar Documentos**
-- ✅ Sí tiene botón **Volver a Successfactors** (igual a ZPAYDOC)
-- ✅ Los documentos se muestran todos sin filtro de fecha
+| | |
+|--|--|
+| App BSP | `ZPERSONDOCS` |
+| Namespace | `mis.documentos` |
+| Paquete pruebas | `$TMP` |
+| Paquete producción | `ZHCC_PE` |
+| URL final | `https://<servidor>/sap/bc/ui5_ui5/sap/zpersondocs/index.html?sap-client=100` |
 
 ---
 
-## Endpoints que ABAP debe entregar
+## Sobre los filtros de fecha
 
-### Endpoint 1 — Bootstrap de usuario logueado
+Este formulario no tiene buscador de fechas — fue confirmado así por BG/Luis.
+La columna "Fecha de Emisión" sí aparece en la tabla pero es solo informativa;
+el endpoint devuelve todos los documentos del colaborador de una sola vez.
 
-Este endpoint **ya existe en el servidor**; es el mismo que usa ZPAYDOC en producción.
+---
+
+## Endpoint 1 — ¿Quién está logueado?
+
+Este ya existe en el servidor, es el mismo que usa ZPAYDOC.
 
 ```
 GET /sap/bc/ui2/start_up
-Headers: Content-Type: application/json
 ```
 
-**Respuesta esperada:**
-
+Respuesta esperada:
 ```json
 { "id": "10002345" }
 ```
 
-> `id` es el `PERNR` del colaborador cuya sesión SSO está activa.
+El `id` es el PERNR del usuario con sesión activa. Si en lugar de JSON llega
+HTML, la sesión expiró y el frontend recarga para ir al login.
 
-Si la respuesta es `text/html`, la sesión expiró y se debe redirigir a login.
-
-**Función a reemplazar:** `getUserInfo()` en `App.controller.js`
+**Función a reemplazar:** `getUserInfo()` — buscar `[REEMPLAZAR ABAP - EP1]`
 
 ---
 
-### Endpoint 2 — Listado de documentos del colaborador
-
-El equipo ABAP debe exponer un servicio OData que devuelva todos los documentos de la tabla (o vista) `ZHRT_INFOTRABAJA` para el `PERNR` logueado, **sin filtro de período**.
+## Endpoint 2 — Lista de documentos del colaborador
 
 ```
-GET /sap/opu/odata/sap/<SERVICIO_ABAP>/ZHRTInfotSet
-    ?$format=json
-    &$filter=Pernr eq '<PERNR>'
-Headers: Content-Type: application/json
+GET /sap/opu/odata/sap/<SERVICIO>/ZHRTInfotSet?$format=json&$filter=Pernr eq '<PERNR>'
 ```
 
-**Estructura de respuesta esperada:**
+El servicio lee de la tabla `ZHRT_INFOTRABAJA` y devuelve todos los documentos
+del PERNR. Sin filtro de período.
 
+Respuesta esperada:
 ```json
 {
   "d": {
     "results": [
       {
-        "MANDT":       "100",
-        "PERNR":       "10002345",
-        "IDGRUPO":     "04",
-        "IDTIPODOC":   "DNI",
-        "FECHA":       "2026-06-24",
-        "VERDOCUMENTO":"X",
-        "ESTADO":      "V",
-        "DOCUMENTO":   "Documento Nacional de Identidad",
-        "ADJUNTO":     "<base64_del_pdf_o_cadena_no_vacia_si_existe>"
+        "PERNR":        "90000022",
+        "IDGRUPO":      "01",
+        "IDTIPODOC":    "01",
+        "FECHA":        "2026-06-16",
+        "VERDOCUMENTO": "",
+        "DOCUMENTO":    "Compromiso de Adhesión",
+        "ADJUNTO":      "<base64 del PDF>"
       }
     ]
   }
 }
 ```
 
-**Campos requeridos por el frontend:**
+Campos que usa el frontend:
 
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| `PERNR` | String | Número de personal |
-| `IDGRUPO` | String | Código de grupo (ver tabla abajo) |
-| `IDTIPODOC` | String | Código de tipo de documento |
-| `FECHA` | String `YYYY-MM-DD` | Fecha de emisión del documento |
-| `VERDOCUMENTO` | String | `"X"` = leído/aprobado, `""` = pendiente |
-| `DOCUMENTO` | String | Nombre visible del documento en la tabla |
-| `ADJUNTO` | String | Base64 del PDF **o** cualquier valor no vacío si existe PDF |
+| Campo | Qué hace el frontend con él |
+|-------|-----------------------------|
+| `IDGRUPO` | Agrupa las filas (ver códigos abajo) |
+| `IDTIPODOC` | Identifica el documento dentro del grupo |
+| `FECHA` | Se muestra en la columna "Fecha de Emisión" |
+| `VERDOCUMENTO` | `"X"` = Aprobado, `""` = Pendiente |
+| `DOCUMENTO` | Nombre que aparece en la tabla |
+| `ADJUNTO` | PDF en Base64 — si viene vacío, no muestra el ícono del ojo |
 
-**Grupos esperados (`IDGRUPO`):**
+Grupos (`IDGRUPO`):
 
-| Código | Grupo visible |
-|--------|--------------|
+| Código | Nombre en pantalla |
+|--------|--------------------|
 | `01` | Código de Ética |
 | `02` | Reglamentos y cargos |
 | `03` | Autorizaciones/Compensaciones |
@@ -122,161 +106,92 @@ Headers: Content-Type: application/json
 | `06` | Documentos de Familiares |
 | `07` | Documentos de Ingreso |
 
-**Función a reemplazar:** `_simulateGetDocuments()` en `App.controller.js`
+**Funciones a reemplazar:** `_simulateGetDocuments()` y `_simulatePDFLoad()` — buscar `[REEMPLAZAR ABAP - EP2]`
+
+### Ojo con el campo ADJUNTO
+
+Al revisar la tabla `ZHRT_INFOTRABAJA` en el Data Browser encontramos que no todos
+los registros tienen el mismo formato en ese campo:
+
+- Los que empiezan con `JVBERi0x` son PDF en Base64 — estos sí funcionan con el visor
+- Los que empiezan con `UEsDBBQ` son archivos ZIP o Word en Base64 — el visor no los puede abrir
+- Uno venía en hexadecimal (`255044462D...`) en lugar de Base64 — tampoco funciona
+
+El Data Browser trunca el campo en pantalla pero el contenido completo sí está en la BD
+(lo confirmamos decodificando el fragmento visible del hexadecimal y salió el header `%PDF-1.7`).
+
+Antes de publicar el servicio hay que confirmar dos cosas:
+1. Que `ADJUNTO` siempre venga en **Base64** — no en hex ni en otros formatos
+2. Que el campo `DOCUMENTO` venga con el nombre legible del documento — en los registros
+   de prueba venía vacío, así que el frontend actualmente muestra el código `IDTIPODOC`
 
 ---
 
-### Endpoint 3 — Obtener PDF y marcar como leído
+## Marcar documento como leído
 
-Se compone de dos pasos, igual al patrón que usa ZPAYDOC en producción con `ZODATA_FORMULARIO_SRV` + `ZODATA_DOCUMENTO_PEND_Y_VISTOS_SRV`.
+Cuando el colaborador abre un PDF y cierra el visor, el frontend registra la lectura.
+Es el mismo patrón que usa ZPAYDOC (función `UpdateFlag`).
 
-#### Paso A — Obtener el PDF (Base64)
-
+Primero se captura el token CSRF:
 ```
-GET /sap/opu/odata/sap/<SERVICIO_PDF_ABAP>/ZHRTDocSet
-    ?$format=json
-    &$filter=Pernr eq '<PERNR>' and Idtipodoc eq '<IDTIPODOC>'
-Headers: Content-Type: application/json
+GET /sap/opu/odata/sap/<SERVICIO>/ZHRTInfotSet(Pernr='...',Idtipodoc='...')
+Header: X-CSRF-Token: fetch
 ```
 
-**Respuesta esperada:**
-
-```json
-{
-  "d": {
-    "results": [
-      { "Base64": "<cadena_base64_del_pdf>" }
-    ]
-  }
-}
+Luego se envía el PATCH:
+```
+PATCH /sap/opu/odata/sap/<SERVICIO>/ZHRTInfotSet(Pernr='...',Idtipodoc='...')
+Header: X-CSRF-Token: <token capturado>
+Body:   { "Aceptlectura": "SI" }
 ```
 
-El frontend convierte el Base64 a Blob URL usando la función `base64ToObjectUrl()` (ya existe en el controller) y lo inyecta en el iframe. Patrón idéntico a ZPAYDOC.
-
-#### Paso B — Marcar como leído (CSRF dance)
-
-Igual al patrón de ZPAYDOC (`UpdateFlag`):
-
-```
-// Paso 1: capturar token
-GET /sap/opu/odata/sap/<SERVICIO_ABAP>/ZHRTInfotSet(Pernr='...',Idtipodoc='...')
-Headers: X-CSRF-Token: fetch
-→ Guardar el token del header X-CSRF-Token de la respuesta
-
-// Paso 2: marcar leído
-PATCH /sap/opu/odata/sap/<SERVICIO_ABAP>/ZHRTInfotSet(Pernr='...',Idtipodoc='...')
-Headers: Content-Type: application/json
-         X-CSRF-Token: <token_capturado>
-Body:    { "Aceptlectura": "SI" }
-```
-
-**Funciones a reemplazar:** `_simulatePDFLoad()` y `_simulateMarkAsRead()` en `App.controller.js`
+**Función a reemplazar:** `_simulateMarkAsRead()` — buscar `[REEMPLAZAR ABAP - EP3 paso B]`
 
 ---
 
-## Archivos a modificar para la integración
+## Dónde hacer los reemplazos
 
-```
-C:\SAPUI5\webapp\controller\App.controller.js
-```
-
-Buscar las tres etiquetas `[REEMPLAZAR ABAP]`:
+Abrir `webapp/controller/App.controller.js` y buscar estas etiquetas:
 
 | Etiqueta | Función | Endpoint |
 |----------|---------|----------|
-| `[REEMPLAZAR ABAP - EP1]` | `getUserInfo()` | EP1 — `/sap/bc/ui2/start_up` |
-| `[REEMPLAZAR ABAP - EP2]` | `_simulateGetDocuments()` | EP2 — Listado OData |
-| `[REEMPLAZAR ABAP - EP3 paso A]` | `_simulatePDFLoad()` | EP3 — PDF Base64 |
-| `[REEMPLAZAR ABAP - EP3 paso B]` | `_simulateMarkAsRead()` | EP3 — CSRF + PATCH |
+| `[REEMPLAZAR ABAP - EP1]` | `getUserInfo()` | GET /sap/bc/ui2/start_up |
+| `[REEMPLAZAR ABAP - EP2]` | `_simulateGetDocuments()` | GET OData lista |
+| `[REEMPLAZAR ABAP - EP2 / visor PDF]` | `_simulatePDFLoad()` | decode ADJUNTO |
+| `[REEMPLAZAR ABAP - EP3 paso B]` | `_simulateMarkAsRead()` | CSRF + PATCH |
 
-Cada etiqueta tiene el **código real listo como comentario** — solo hay que descomentar y ajustar el nombre del servicio ABAP.
+El código real de cada reemplazo está comentado justo encima de cada función.
 
 ---
 
-## Deploy al repositorio ABAP
+## Deploy
 
-### Opción A — Subida manual (recomendada, sin dependencia de permisos ADT)
-
-1. Construir el ZIP actualizado:
-   ```
-   cd C:\SAPUI5
-   pnpm exec ui5 build
-   ```
-   Luego comprimir la carpeta `dist/` como `ZPERSONDOCS.zip`.
-
-2. En SAP GUI, ejecutar desde **SE38** o **SA38**:
-   ```
-   /UI5/UI5_REPOSITORY_LOAD
-   ```
-   > ⚠️ Es un **reporte/programa**, no una transacción. No funciona desde el campo de comandos.
-
-3. Parámetros:
-   | Campo | Valor |
-   |-------|-------|
-   | Nombre BSP App | `ZPERSONDOCS` |
-   | Archivo ZIP | `C:\SAPUI5\ZPERSONDOCS.zip` |
-   | Paquete (prueba) | `$TMP` |
-   | Paquete (final) | `ZHCC_PE` |
-
-### Opción B — Deploy por CLI (requiere autorización ADT)
+### Build + ZIP
 
 ```bash
-cd C:\SAPUI5
-pnpm run deploy
-```
-
-> El CLI falló con HTTP 403. Requiere que Basis otorgue autorización ADT (`S_ADT_RES`) o acceso a `/sap/bc/adt/`.
-
----
-
-## Verificación post-integración
-
-Después de que ABAP entregue los endpoints y se reemplacen las funciones simuladas:
-
-- [ ] La app carga en: `/sap/bc/ui5_ui5/sap/zpersondocs/index.html?sap-client=100`
-- [ ] Al abrir, se resuelve el `PERNR` del usuario logueado vía SSO
-- [ ] La tabla muestra los documentos agrupados por categoría
-- [ ] El ícono del ojo solo aparece en filas con PDF disponible
-- [ ] Al hacer clic en el ojo, abre el PDF en el dialog
-- [ ] Al cerrar el dialog, el estado pasa a "Aprobado" en la tabla
-- [ ] El botón "Volver a Successfactors" redirige a `https://hcm-br10.hr.cloud.sap/sf/start`
-- [ ] No hay filtros de período (confirmado: no van en este formulario)
-
----
-
-## Estructura de archivos relevantes
-
-```
-C:\SAPUI5\
-├── webapp/
-│   ├── controller/
-│   │   ├── App.controller.js     ← Lógica principal + puntos [REEMPLAZAR ABAP]
-│   │   └── BaseController.js     ← Helpers base
-│   ├── view/
-│   │   ├── App.view.xml          ← Vista principal (TreeTable + Panel)
-│   │   └── ShowPDF.fragment.xml  ← Dialog visor de PDF
-│   ├── css/
-│   │   └── style.css             ← Estilos Yambal (naranja) + layout
-│   └── model/
-│       └── sample.pdf            ← PDF de prueba (solo simulación local)
-├── ui5.yaml                      ← Configuración SAPUI5 tooling
-├── ui5-deploy.yaml               ← Configuración deploy ABAP CLI
-├── package.json                  ← Scripts y dependencias
-└── ZPERSONDOCS.zip               ← ZIP listo para subir vía SE38
-```
-
----
-
-## Comandos locales
-
-```bash
-# Servidor de desarrollo
-pnpm start
-# → http://localhost:8080/index.html
-
-# Build para producción
 pnpm exec ui5 build
-
-# Deploy CLI (requiere autorización ADT en el servidor)
-pnpm run deploy
 ```
+Comprimir la carpeta `dist/` como `ZPERSONDOCS.zip`.
+
+### Subir a SAP
+
+En SAP GUI abrir **SE38** o **SA38** y ejecutar el programa `/UI5/UI5_REPOSITORY_LOAD`.
+Es un programa ABAP, no una transacción — no funciona escribiéndolo directo en el
+campo de comandos.
+
+Parámetros:
+- App BSP: `ZPERSONDOCS`
+- ZIP: `ZPERSONDOCS.zip`
+- Paquete: `$TMP` para pruebas, `ZHCC_PE` para producción
+
+Si prefieren el CLI (`pnpm run deploy`) necesitan autorización ADT — por ahora devuelve 403.
+
+---
+
+## Checklist post-integración
+
+- [ ] La app abre y el usuario se identifica automáticamente por SSO
+- [ ] La tabla muestra los documentos agrupados correctamente
+- [ ] Las filas sin ADJUNTO no muestran el ícono del ojo
+- [ ] Al abrir el visor se carga el PDF del campo ADJUNTO
+- [ ] El botón "Volver a Successfactors" redirige correctamente

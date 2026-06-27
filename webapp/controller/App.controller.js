@@ -13,46 +13,37 @@ sap.ui.define([
 	// App.controller — ZPERSONDOCS "Mis Documentos" (Yambal)
 	// -----------------------------------------------------------------------
 	// Patron de referencia: ZPAYDOC (deployado en produccion en el mismo
-	// servidor SAP). Ver C:\Proyectos de GUIA UI5\ZPAYDOC.
+	// servidor SAP).
 	//
 	// ESTADO ACTUAL: frontend completo con simulacion local.
-	// Pendiente: reemplazar los 3 metodos marcados con [REEMPLAZAR ABAP]
-	// cuando el equipo ABAP entregue los endpoints indicados en el README.
+	// Pendiente: reemplazar los metodos marcados con [REEMPLAZAR ABAP]
+	// cuando el equipo ABAP entregue los 2 endpoints indicados en README.md.
 	//
-	// ENDPOINTS QUE ABAP DEBE ENTREGAR (ver README.md para contrato completo)
+	// ENDPOINTS QUE ABAP DEBE ENTREGAR
 	// -----------------------------------------------------------------------
 	//
 	// [ENDPOINT 1] Bootstrap de usuario logueado
 	//   GET /sap/bc/ui2/start_up
 	//   -> Respuesta JSON: { "id": "<PERNR>" }
 	//   -> Si devuelve text/html: sesion expirada, redirigir a login
-	//   -> Patron identico a ZPAYDOC (mismo endpoint, mismo servidor)
+	//   -> Este endpoint ya existe en el servidor (lo usa ZPAYDOC)
 	//   -> Reemplazar en: getUserInfo()
 	//
 	// [ENDPOINT 2] Listado de documentos del colaborador
 	//   GET /sap/opu/odata/sap/<SERVICIO_ABAP>/ZHRTInfotSet
 	//         ?$format=json
 	//         &$filter=Pernr eq '<PERNR>'
-	//   -> Sin filtro de periodo (confirmado por BG/Luis: no hay Periodo Inicio/Fin)
-	//   -> Respuesta: { "d": { "results": [ { ...campos ZHRT_INFOTRABAJA... } ] } }
-	//   -> Campos requeridos por el frontend: MANDT, PERNR, IDGRUPO, IDTIPODOC,
-	//      FECHA (YYYY-MM-DD), VERDOCUMENTO ("X"=leido/""), ESTADO ("V"/"P"),
-	//      DOCUMENTO (nombre visible), ADJUNTO (Base64 PDF o "1" si existe)
-	//   -> Reemplazar en: _simulateGetDocuments()
+	//   -> Sin filtro de periodo (no hay buscador de fechas en este formulario)
+	//   -> El campo ADJUNTO de cada fila YA CONTIENE el Base64 del PDF
+	//      (confirmado en tabla ZHRT_INFOTRABAJA — columna ADJUNTO)
+	//   -> El frontend decodifica ADJUNTO con base64ToObjectUrl() al abrir el visor
+	//   -> Reemplazar en: _simulateGetDocuments() y _simulatePDFLoad()
 	//
-	// [ENDPOINT 3] PDF del documento + marcar como leido
-	//   Paso A — Obtener PDF:
-	//     GET /sap/opu/odata/sap/<SERVICIO_PDF_ABAP>/ZHRTDocSet
-	//           ?$format=json
-	//           &$filter=Pernr eq '<PERNR>' and Idtipodoc eq '<IDTIPODOC>'
-	//     -> Respuesta: { "d": { "results": [ { "Base64": "<cadena_base64>" } ] } }
-	//     -> El frontend convierte Base64 -> Blob URL con base64ToObjectUrl()
-	//        (patron identico a ZPAYDOC / ZODATA_FORMULARIO_SRV)
-	//   Paso B — Marcar como leido (CSRF dance, patron identico a ZPAYDOC):
-	//     1) GET <url_documento> con header X-CSRF-Token: fetch -> captura token
-	//     2) PATCH <url_documento> con X-CSRF-Token: <token>
-	//           body: { "Aceptlectura": "SI" }
-	//   -> Reemplazar en: _simulatePDFLoad() y _simulateMarkAsRead()
+	// [MARCAR COMO LEIDO] CSRF dance sobre el mismo servicio del Endpoint 2
+	//   Paso 1: GET con header X-CSRF-Token: fetch -> captura token
+	//   Paso 2: PATCH con X-CSRF-Token: <token> y body { "Aceptlectura": "SI" }
+	//   -> Patron identico a ZPAYDOC (funcion UpdateFlag en Main.controller.js)
+	//   -> Reemplazar en: _simulateMarkAsRead()
 	// -----------------------------------------------------------------------
 
 	// Constantes de mapeo ZHRT_INFOTRABAJA -> UI
@@ -439,29 +430,23 @@ sap.ui.define([
 		},
 
 		// -------------------------------------------------------------------
-		// _simulatePDFLoad                     [REEMPLAZAR ABAP - EP3 paso A]
+		// _simulatePDFLoad              [REEMPLAZAR ABAP - EP2 / visor PDF]
 		// -------------------------------------------------------------------
 		// SIMULACION: carga model/sample.pdf como blob URL local.
 		//
-		// REEMPLAZAR CON (patron identico a ZPAYDOC/ZODATA_FORMULARIO_SRV):
-		//   var sUrl = "/sap/opu/odata/sap/<SERVICIO_PDF_ABAP>/ZHRTDocSet"
-		//            + "?$format=json"
-		//            + "&$filter=Pernr eq '" + loggeduser + "'"
-		//            + " and Idtipodoc eq '" + oDoc.raw.IDTIPODOC + "'";
-		//   return new Promise(function(resolve, reject) {
-		//     $.ajax({ url: sUrl, method: "GET",
-		//              headers: { "Content-Type": "application/json" } })
-		//       .done(function(response) {
-		//         var sBase64 = response.d.results[0].Base64;
-		//         var sBlobUrl = base64ToObjectUrl(sBase64);   // funcion ya existe
-		//         var sTitle = oDoc.name + " - " + oDoc.date;
-		//         resolve({ url: sBlobUrl, title: sTitle, isBlobUrl: true });
-		//       })
-		//       .fail(function(err) { reject(err); });
-		//   });
+		// REEMPLAZAR CON:
+		//   El campo ADJUNTO del Endpoint 2 ya contiene el Base64 del PDF.
+		//   Solo hay que decodificarlo con la funcion base64ToObjectUrl()
+		//   que ya existe en este controller:
+		//
+		//   var sTitle = oDoc.name + " - " + oDoc.date;
+		//   var sBlobUrl = base64ToObjectUrl(oDoc.raw.ADJUNTO);
+		//   return Promise.resolve({ url: sBlobUrl, title: sTitle, isBlobUrl: true });
+		//
+		//   No se necesita una llamada HTTP adicional para obtener el PDF.
 		// -------------------------------------------------------------------
 		_simulatePDFLoad: function (oDoc) {
-			// [SIMULACION — reemplazar con llamada OData al servicio ABAP de PDF]
+			// [SIMULACION — en produccion usar: base64ToObjectUrl(oDoc.raw.ADJUNTO)]
 			return new Promise(function (resolve) {
 				setTimeout(function () {
 					var sTitle = (oDoc && oDoc.name ? oDoc.name : "Documento") +
@@ -524,11 +509,7 @@ sap.ui.define([
 		},
 
 		// -------------------------------------------------------------------
-		// onCloseShowPDF: handler de Cerrar / Cancelar
-		// -------------------------------------------------------------------
-		// Cierra el dialogo, revoca la objectURL para no fugar memoria y
-		// dispara la simulacion de "marcar como leido" (CSRF dance) si la
-		// hoja no estaba ya marcada.
+		// onCloseShowPDF: cierra el dialog y dispara el CSRF dance
 		// -------------------------------------------------------------------
 		onCloseShowPDF: function () {
 			if (this._oShowPDF) {
@@ -539,10 +520,10 @@ sap.ui.define([
 				this._sShowPDFUrl = null;
 			}
 
-			// Marcar como leido solo si el documento tiene adjunto y no
-			// estaba ya marcado. En produccion, el GET /visualize ya
-			// devuelve el flag actualizado; aqui lo hacemos al cerrar.
-			if (selectedDoc && selectedDoc.raw && selectedDoc.raw.VERDOCUMENTO !== "X") {
+			// Enviar el PATCH al cerrar. El status visible en la tabla
+			// lo determina el backend en la siguiente carga — el frontend
+			// no muta nada localmente.
+			if (selectedDoc && selectedDoc.raw) {
 				this._simulateMarkAsRead(selectedDoc);
 			}
 		},
@@ -550,9 +531,9 @@ sap.ui.define([
 		// -------------------------------------------------------------------
 		// _simulateMarkAsRead              [REEMPLAZAR ABAP - EP3 paso B]
 		// -------------------------------------------------------------------
-		// SIMULACION: espera timeouts y muta el modelo local.
+		// SIMULACION: solo imprime en consola — no muta el modelo local.
 		//
-		// REEMPLAZAR CON (patron CSRF identico a ZPAYDOC/UpdateFlag):
+		// REEMPLAZAR CON (patron CSRF identico a ZPAYDOC / UpdateFlag):
 		//   var sBaseUrl = "/sap/opu/odata/sap/<SERVICIO_ABAP>/ZHRTInfotSet("
 		//     + "Pernr='" + oDoc.raw.PERNR + "'"
 		//     + ",Idtipodoc='" + oDoc.raw.IDTIPODOC + "'"
@@ -563,52 +544,22 @@ sap.ui.define([
 		//                       "X-CSRF-Token": "fetch" } })
 		//     .done(function(response, textStatus, xhr) {
 		//       csrf_token = xhr.getResponseHeader("X-CSRF-Token");
-		//       // Paso 2: PATCH para marcar leido
+		//       // Paso 2: PATCH para registrar la lectura
 		//       $.ajax({ url: sBaseUrl, method: "PATCH",
 		//                headers: { "Content-Type": "application/json",
 		//                           "X-CSRF-Token": csrf_token },
 		//                data: JSON.stringify({ "Aceptlectura": "SI" }) })
 		//         .done(function() {
-		//           // Actualizar UI igual que la simulacion:
-		//           var oModel = this.getModel("docs");
-		//           if (oModel && oDoc.__oContextPath)
-		//             oModel.setProperty(oDoc.__oContextPath + "/status", STATUS_APPROVED);
-		//           MessageToast.show("Documento marcado como leido");
-		//         }.bind(this));
-		//     }.bind(this));
+		//           // El status lo devuelve el backend en el siguiente GET.
+		//           // No se muta el modelo local.
+		//         });
+		//     });
 		// -------------------------------------------------------------------
 		_simulateMarkAsRead: function (oDoc) {
 			if (!oDoc || !oDoc.raw) { return; }
-
-			// Paso 1: captura del token
-			setTimeout(function () {
-				csrf_token = "CSRF_" + Date.now();
-
-				// Paso 2: PATCH con el token capturado
-				setTimeout(function () {
-					oDoc.raw.VERDOCUMENTO = "X";
-					oDoc.raw.ESTADO = "V";
-
-					// Refrescar la fila del modelo para que la columna
-					// Estado pase a "Aprobado" sin recargar todo el Tree.
-					var oModel = this.getModel("docs");
-					if (oModel) {
-						var sPath = oDoc.__oContextPath;
-						if (sPath) {
-							oModel.setProperty(sPath + "/status", STATUS_APPROVED);
-						} else {
-							// Fallback: refrescar el modelo completo. Mas
-							// costoso pero garantiza consistencia si no
-							// pudimos capturar la path del context.
-							var oTable = this.byId("treeTable");
-							if (oTable) {
-								oTable.getBinding("rows").refresh(true);
-							}
-						}
-					}
-					MessageToast.show("Documento marcado como leido");
-				}.bind(this), 300);
-			}.bind(this), 200);
+			// [SIMULACION — en produccion reemplazar con el CSRF dance real]
+			// eslint-disable-next-line no-console
+			console.log("[simulacion] PATCH marcar leido:", oDoc.raw.PERNR, oDoc.raw.IDTIPODOC);
 		},
 
 		// -------------------------------------------------------------------
