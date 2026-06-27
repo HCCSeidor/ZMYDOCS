@@ -164,6 +164,23 @@ El código real de cada reemplazo está comentado justo encima de cada función.
 
 ---
 
+## Correr el proyecto en local
+
+Requisitos: Node.js instalado y pnpm. Si no tienen pnpm:
+```bash
+npm install -g pnpm
+```
+
+Luego en la raíz del proyecto:
+```bash
+pnpm install
+pnpm start
+```
+
+La app abre en `http://localhost:8080/index.html` con datos simulados.
+
+---
+
 ## Deploy
 
 ### Build + ZIP
