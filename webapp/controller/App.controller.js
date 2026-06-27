@@ -10,21 +10,49 @@ sap.ui.define([
 	"use strict";
 
 	// -----------------------------------------------------------------------
-	// App.controller (ZPAYDOC-style)
+	// App.controller — ZPERSONDOCS "Mis Documentos" (Yambal)
 	// -----------------------------------------------------------------------
-	// Punto de entrada de la pantalla "Mis Documentos". El controlador
-	// extiende BaseController y es dueño del modelo con nombre "docs", del
-	// dialogo "ShowPDF" y de los flags de sesion (loggeduser, csrf_token,
-	// selectedDoc). Toda la integracion con backend esta simulada para
-	// reproducir localmente los tres endpoints reales:
+	// Patron de referencia: ZPAYDOC (deployado en produccion en el mismo
+	// servidor SAP). Ver C:\Proyectos de GUIA UI5\ZPAYDOC.
 	//
-	//   1) GET  /sap/bc/ui2/start_up           -> bootstrap de usuario
-	//   2) GET  /sap/opu/.../ZHRT_INFOTRABAJA  -> listado por rango
-	//   3) GET  /sap/opu/.../ZHRT_INFOTRABAJA(id)/VisualizeSet
-	//        + PATCH .../VisualizeSet          -> visor + marcar leido
+	// ESTADO ACTUAL: frontend completo con simulacion local.
+	// Pendiente: reemplazar los 3 metodos marcados con [REEMPLAZAR ABAP]
+	// cuando el equipo ABAP entregue los endpoints indicados en el README.
 	//
-	// Cada simulacion devuelve Promise para que el switch a OData/REST sea
-	// un drop-in replacement.
+	// ENDPOINTS QUE ABAP DEBE ENTREGAR (ver README.md para contrato completo)
+	// -----------------------------------------------------------------------
+	//
+	// [ENDPOINT 1] Bootstrap de usuario logueado
+	//   GET /sap/bc/ui2/start_up
+	//   -> Respuesta JSON: { "id": "<PERNR>" }
+	//   -> Si devuelve text/html: sesion expirada, redirigir a login
+	//   -> Patron identico a ZPAYDOC (mismo endpoint, mismo servidor)
+	//   -> Reemplazar en: getUserInfo()
+	//
+	// [ENDPOINT 2] Listado de documentos del colaborador
+	//   GET /sap/opu/odata/sap/<SERVICIO_ABAP>/ZHRTInfotSet
+	//         ?$format=json
+	//         &$filter=Pernr eq '<PERNR>'
+	//   -> Sin filtro de periodo (confirmado por BG/Luis: no hay Periodo Inicio/Fin)
+	//   -> Respuesta: { "d": { "results": [ { ...campos ZHRT_INFOTRABAJA... } ] } }
+	//   -> Campos requeridos por el frontend: MANDT, PERNR, IDGRUPO, IDTIPODOC,
+	//      FECHA (YYYY-MM-DD), VERDOCUMENTO ("X"=leido/""), ESTADO ("V"/"P"),
+	//      DOCUMENTO (nombre visible), ADJUNTO (Base64 PDF o "1" si existe)
+	//   -> Reemplazar en: _simulateGetDocuments()
+	//
+	// [ENDPOINT 3] PDF del documento + marcar como leido
+	//   Paso A — Obtener PDF:
+	//     GET /sap/opu/odata/sap/<SERVICIO_PDF_ABAP>/ZHRTDocSet
+	//           ?$format=json
+	//           &$filter=Pernr eq '<PERNR>' and Idtipodoc eq '<IDTIPODOC>'
+	//     -> Respuesta: { "d": { "results": [ { "Base64": "<cadena_base64>" } ] } }
+	//     -> El frontend convierte Base64 -> Blob URL con base64ToObjectUrl()
+	//        (patron identico a ZPAYDOC / ZODATA_FORMULARIO_SRV)
+	//   Paso B — Marcar como leido (CSRF dance, patron identico a ZPAYDOC):
+	//     1) GET <url_documento> con header X-CSRF-Token: fetch -> captura token
+	//     2) PATCH <url_documento> con X-CSRF-Token: <token>
+	//           body: { "Aceptlectura": "SI" }
+	//   -> Reemplazar en: _simulatePDFLoad() y _simulateMarkAsRead()
 	// -----------------------------------------------------------------------
 
 	// Constantes de mapeo ZHRT_INFOTRABAJA -> UI
@@ -284,16 +312,25 @@ sap.ui.define([
 		},
 
 		// -------------------------------------------------------------------
-		// getUserInfo: simulacion del endpoint /sap/bc/ui2/start_up
+		// getUserInfo                              [REEMPLAZAR ABAP - EP1]
 		// -------------------------------------------------------------------
-		// En el flujo real:
-		//   GET /sap/bc/ui2/start_up
-		//     -> 200 application/json { id: <PERNR> } si el SSO esta OK
-		//     -> 302 text/html (redirect a login) si la sesion expiro
-		// Aqui saltamos la llamada HTTP, fijamos un usuario y avanzamos al
-		// listado.
+		// SIMULACION: fija loggeduser = "DEMO_USER" y carga documentos.
+		//
+		// REEMPLAZAR CON:
+		//   $.ajax({ url: "/sap/bc/ui2/start_up", method: "GET",
+		//            headers: { "Content-Type": "application/json" } })
+		//     .done(function(response, textStatus, xhr) {
+		//       if (xhr.getResponseHeader("content-type").indexOf("text/html") >= 0) {
+		//         // sesion expirada — recargar para redirigir a login SAP
+		//         location.reload();
+		//         return;
+		//       }
+		//       loggeduser = response.id;   // PERNR del colaborador logueado
+		//       that.onSearchDocuments();
+		//     });
 		// -------------------------------------------------------------------
 		getUserInfo: function () {
+			// [SIMULACION — reemplazar con llamada real a /sap/bc/ui2/start_up]
 			loggeduser = "DEMO_USER";
 			this.onSearchDocuments();
 		},
@@ -338,18 +375,30 @@ sap.ui.define([
 		},
 
 		// -------------------------------------------------------------------
-		// _simulateGetDocuments: GET /sap/opu/.../ZHRT_INFOTRABAJA
+		// _simulateGetDocuments                    [REEMPLAZAR ABAP - EP2]
 		// -------------------------------------------------------------------
-		// Devuelve todos los documentos del colaborador sin filtro de fecha.
-		// El delay de 500 ms reproduce el round-trip ABAP para que la UX
-		// (BusyIndicator) se vea identica a produccion.
+		// SIMULACION: devuelve filas hardcodeadas con shape ZHRT_INFOTRABAJA.
+		//
+		// REEMPLAZAR CON:
+		//   var sUrl = "/sap/opu/odata/sap/<SERVICIO_ABAP>/ZHRTInfotSet"
+		//            + "?$format=json&$filter=Pernr eq '" + loggeduser + "'";
+		//   return new Promise(function(resolve, reject) {
+		//     $.ajax({ url: sUrl, method: "GET",
+		//              headers: { "Content-Type": "application/json" } })
+		//       .done(function(resp) { resolve(resp.d.results); })
+		//       .fail(function(err)  { reject(err); });
+		//   });
+		//
+		// CAMPOS QUE EL FRONTEND CONSUME DE CADA FILA:
+		//   PERNR, IDGRUPO, IDTIPODOC, FECHA (YYYY-MM-DD),
+		//   VERDOCUMENTO ("X"=leido / ""=pendiente),
+		//   DOCUMENTO (nombre visible), ADJUNTO (Base64 PDF o "1" si existe)
 		// -------------------------------------------------------------------
 		_simulateGetDocuments: function () {
+			// [SIMULACION — reemplazar con llamada OData al servicio ABAP]
 			var aAll = buildSampleRawRecords();
 			return new Promise(function (resolve) {
-				setTimeout(function () {
-					resolve(aAll);
-				}, 500);
+				setTimeout(function () { resolve(aAll); }, 500);
 			});
 		},
 
@@ -390,23 +439,33 @@ sap.ui.define([
 		},
 
 		// -------------------------------------------------------------------
-		// _simulatePDFLoad: GET /documents/{id}/visualize
+		// _simulatePDFLoad                     [REEMPLAZAR ABAP - EP3 paso A]
 		// -------------------------------------------------------------------
-		// En produccion: stream binario + ya marca como leido. Aqui solo
-		// devolvemos el base64 local y la metadata para el titulo del
-		// dialogo. La accion de "marcar leido" se hace al cerrar.
+		// SIMULACION: carga model/sample.pdf como blob URL local.
+		//
+		// REEMPLAZAR CON (patron identico a ZPAYDOC/ZODATA_FORMULARIO_SRV):
+		//   var sUrl = "/sap/opu/odata/sap/<SERVICIO_PDF_ABAP>/ZHRTDocSet"
+		//            + "?$format=json"
+		//            + "&$filter=Pernr eq '" + loggeduser + "'"
+		//            + " and Idtipodoc eq '" + oDoc.raw.IDTIPODOC + "'";
+		//   return new Promise(function(resolve, reject) {
+		//     $.ajax({ url: sUrl, method: "GET",
+		//              headers: { "Content-Type": "application/json" } })
+		//       .done(function(response) {
+		//         var sBase64 = response.d.results[0].Base64;
+		//         var sBlobUrl = base64ToObjectUrl(sBase64);   // funcion ya existe
+		//         var sTitle = oDoc.name + " - " + oDoc.date;
+		//         resolve({ url: sBlobUrl, title: sTitle, isBlobUrl: true });
+		//       })
+		//       .fail(function(err) { reject(err); });
+		//   });
 		// -------------------------------------------------------------------
 		_simulatePDFLoad: function (oDoc) {
-			// Simulacion del pipeline de produccion:
-			// 1. En produccion: ABAP devuelve Base64 -> base64ToObjectUrl() -> blob URL
-			// 2. Aqui: fetch(sample.pdf) -> blob -> blob URL
-			// Ambos prueban exactamente lo mismo: si Chrome en SAP acepta
-			// blob: URLs en el iframe. Sin necesitar 163KB de base64 embebido.
+			// [SIMULACION — reemplazar con llamada OData al servicio ABAP de PDF]
 			return new Promise(function (resolve) {
 				setTimeout(function () {
 					var sTitle = (oDoc && oDoc.name ? oDoc.name : "Documento") +
 						" - " + (oDoc && oDoc.date ? oDoc.date : "");
-
 					fetch("model/sample.pdf")
 						.then(function (oResponse) { return oResponse.blob(); })
 						.then(function (oBlob) {
@@ -414,7 +473,6 @@ sap.ui.define([
 							resolve({ url: sBlobUrl, title: sTitle, isBlobUrl: true });
 						})
 						.catch(function () {
-							// Fallback si fetch falla (no deberia pasar en SAP)
 							resolve({ url: "model/sample.pdf", title: sTitle, isBlobUrl: false });
 						});
 				}, 500);
@@ -490,15 +548,34 @@ sap.ui.define([
 		},
 
 		// -------------------------------------------------------------------
-		// _simulateMarkAsRead: PATCH /documents/{id} (CSRF dance)
+		// _simulateMarkAsRead              [REEMPLAZAR ABAP - EP3 paso B]
 		// -------------------------------------------------------------------
-		// Reproduce el patron real de dos pasos:
-		//   1) GET  con X-CSRF-Token: fetch     -> captura token
-		//   2) PATCH con X-CSRF-Token: <captured> y body {Aceptlectura:"SI"}
+		// SIMULACION: espera timeouts y muta el modelo local.
 		//
-		// Aqui no hay red: esperamos 200 ms para "fetch" y 300 ms para
-		// "PATCH", y al final mutamos el registro crudo y refrescamos la
-		// fila del modelo.
+		// REEMPLAZAR CON (patron CSRF identico a ZPAYDOC/UpdateFlag):
+		//   var sBaseUrl = "/sap/opu/odata/sap/<SERVICIO_ABAP>/ZHRTInfotSet("
+		//     + "Pernr='" + oDoc.raw.PERNR + "'"
+		//     + ",Idtipodoc='" + oDoc.raw.IDTIPODOC + "'"
+		//     + ")";
+		//   // Paso 1: capturar CSRF token
+		//   $.ajax({ url: sBaseUrl, method: "GET",
+		//            headers: { "Content-Type": "application/json",
+		//                       "X-CSRF-Token": "fetch" } })
+		//     .done(function(response, textStatus, xhr) {
+		//       csrf_token = xhr.getResponseHeader("X-CSRF-Token");
+		//       // Paso 2: PATCH para marcar leido
+		//       $.ajax({ url: sBaseUrl, method: "PATCH",
+		//                headers: { "Content-Type": "application/json",
+		//                           "X-CSRF-Token": csrf_token },
+		//                data: JSON.stringify({ "Aceptlectura": "SI" }) })
+		//         .done(function() {
+		//           // Actualizar UI igual que la simulacion:
+		//           var oModel = this.getModel("docs");
+		//           if (oModel && oDoc.__oContextPath)
+		//             oModel.setProperty(oDoc.__oContextPath + "/status", STATUS_APPROVED);
+		//           MessageToast.show("Documento marcado como leido");
+		//         }.bind(this));
+		//     }.bind(this));
 		// -------------------------------------------------------------------
 		_simulateMarkAsRead: function (oDoc) {
 			if (!oDoc || !oDoc.raw) { return; }

@@ -258,10 +258,21 @@ body,
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
+  outline: none !important;
   padding: 0 !important;
   min-width: 2.25rem !important;
   width: 2.25rem !important;
   height: 2.25rem !important;
+}
+
+.docEyeBtn:hover,
+.docEyeBtn:active,
+.docEyeBtn:focus,
+.docEyeBtn:focus-visible {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 .docEyeBtn .sapMBtnInner,
@@ -272,28 +283,40 @@ body,
   border: none !important;
   box-shadow: none !important;
   outline: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 2.25rem !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  padding: 0 !important;
 }
 
 .docEyeBtn:focus::after,
-.docEyeBtn .sapMBtnFocusDiv {
+.docEyeBtn:focus::before,
+.docEyeBtn:active::after,
+.docEyeBtn:active::before,
+.docEyeBtn .sapMBtnFocusDiv,
+.docEyeBtn .sapMBtnInner::after,
+.docEyeBtn .sapMBtnInner::before,
+.docEyeBtn:focus .sapMBtnInner::after,
+.docEyeBtn:focus .sapMBtnInner::before {
   display: none !important;
+  content: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .docEyeBtn .sapUiIcon,
 .docEyeBtn .sapMBtnIcon {
   color: #e97600 !important;
   font-size: 1.35rem !important;
-  line-height: 1.35rem !important;
+  line-height: normal !important;
+  margin: 0 !important;
 }
 
 .docEyeBtn .sapUiIcon::before,
 .docEyeBtn .sapMBtnIcon::before {
   font-size: 1.35rem !important;
-}
-
-.docEyeBtn .sapMBtnInner {
-  min-width: 2.25rem !important;
-  width: 2.25rem !important;
-  height: 2.25rem !important;
-  line-height: 2.25rem !important;
 }
